@@ -206,7 +206,7 @@ class meet_bot:
         # Modified code to run as long as the page exists...
         nset = set()
         master_d = {}
-        while(urllib.request.urlopen("https://meet.google.com/emv-hhvp-war").getcode()==200):
+        while(urllib.request.urlopen("Enter gmeet link").getcode()==200):
             start = time.time()
             try:
                 namelist = bot.find_elements_by_class_name("ZjFb7c")  
