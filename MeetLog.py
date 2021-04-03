@@ -9,6 +9,7 @@ import time
 import os
 import keyboard
 import pandas as pd
+import urllib.request
 
 
 
@@ -113,14 +114,14 @@ class meet_bot:
             
             
             # To click 'Join Now' button
-            join_Now = WebDriverWait(bot, 30).until(
+            join_Now = WebDriverWait(bot, 15).until(
                     EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/c-wiz/div/div/div[9]/div[3]/div/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div[1]/span"))
                     )
             join_Now.click()
             
             
             # To click on the participants section
-            parti = WebDriverWait(bot, 10).until(
+            parti = WebDriverWait(bot, 30).until(
                     EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/c-wiz/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[1]/span'))
                     )
             parti.click()
@@ -170,12 +171,47 @@ class meet_bot:
         
         # This section makes a 5 second interval with adjusted sleep based on runtime of the loop 
         # Solved unique name issue.....more or less the same runtime....
+#         nset = set()
+#         master_d = {}
+#         timestamp = 0
+#         while(timestamp <= 2400):
+#             start = time.time()
+#             namelist = bot.find_elements_by_class_name("ZjFb7c")            
+            
+            
+#             for name in namelist:
+#                 try:
+#                     n = name.get_attribute('innerHTML')
+#                     nset.add(n)
+#                 except Exception as e:
+#                     pass
+#             for i in nset:        
+#                 if i in master_d:
+#                     master_d[i] += 5
+#                 else:
+#                     master_d[i] = 0
+#             nset.clear()
+#             end = time.time()
+            
+#             print(end, start, end-start)
+#             print(master_d)
+#             print('\n\n')
+#             time.sleep(5 - (end-start))
+#             timestamp += 5
+        
+        
+        
+        # This section makes a 5 second interval with adjusted sleep based on runtime of the loop 
+        # Solved unique name issue.....more or less the same runtime....
+        # Modified code to run as long as the page exists...
         nset = set()
         master_d = {}
-        timestamp = 0
-        while(timestamp <= 2400):
+        while(urllib.request.urlopen("https://meet.google.com/emv-hhvp-war").getcode()==200):
             start = time.time()
-            namelist = bot.find_elements_by_class_name("ZjFb7c")            
+            try:
+                namelist = bot.find_elements_by_class_name("ZjFb7c")  
+            except Exception as e:
+                break
             
             
             for name in namelist:
@@ -184,6 +220,7 @@ class meet_bot:
                     nset.add(n)
                 except Exception as e:
                     pass
+                
             for i in nset:        
                 if i in master_d:
                     master_d[i] += 5
@@ -196,10 +233,13 @@ class meet_bot:
             print(master_d)
             print('\n\n')
             time.sleep(5 - (end-start))
-            timestamp += 5
+            
         
         
-       
+        
+        
+        
+        
         
         
         # This section creates a dataframe
@@ -228,7 +268,7 @@ class meet_bot:
 
         
 obj = meet_bot()
-obj.login("Enter Mail ID","Enter Password", 'Enter Google Link')
+obj.login("Enter email ID","Password", 'Enter the gmeet link')
 
 
 
