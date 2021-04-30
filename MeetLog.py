@@ -9,6 +9,7 @@ import time
 import os
 import keyboard
 import pandas as pd
+import numpy as np
 import urllib.request
 
 
@@ -80,12 +81,12 @@ class meet_bot:
             next_btn.click()
             
             
-            time.sleep(1)
+            time.sleep(5)
             
             
             # To input the google meet link
             link_var = WebDriverWait(bot, 10).until(
-                    EC.presence_of_element_located((By.XPATH, '/html/body/c-wiz/div/div[2]/div/div[1]/div[3]/div[2]/div[1]/label/input'))
+                    EC.presence_of_element_located((By.XPATH, '/html/body/c-wiz/div/div[2]/div/div[1]/div[3]/div/div[2]/div[1]/label/input'))
                     )
             link_var.send_keys(link)
             
@@ -95,7 +96,7 @@ class meet_bot:
             
             # To click 'Join' button
             join = WebDriverWait(bot, 10).until(
-                    EC.presence_of_element_located((By.XPATH, '/html/body/c-wiz/div/div[2]/div/div[1]/div[3]/div[2]/div[2]/button/div[2]'))
+                    EC.presence_of_element_located((By.XPATH, '/html/body/c-wiz/div/div[2]/div/div[1]/div[3]/div/div[2]/div[2]/button/div[2]'))
                     )
             join.click()
             
@@ -200,67 +201,227 @@ class meet_bot:
 #             timestamp += 5
         
         
-        
+
         # This section makes a 5 second interval with adjusted sleep based on runtime of the loop 
         # Solved unique name issue.....more or less the same runtime....
         # Modified code to run as long as the page exists...
-        nset = set()
-        master_d = {}
-        while(urllib.request.urlopen("Enter gmeet link").getcode()==200):
+#         nset = set()
+#         master_d = {}
+#         while(urllib.request.urlopen("https://meet.google.com/emv-hhvp-war").getcode()==200):
+#             start = time.time()
+#             try:
+#                 namelist = bot.find_elements_by_class_name("ZjFb7c")  
+#             except Exception as e:
+#                 break
+            
+            
+#             for name in namelist:
+#                 try:
+#                     n = name.get_attribute('innerHTML')
+#                     nset.add(n)
+#                 except Exception as e:
+#                     pass
+                
+#             for i in nset:        
+#                 if i in master_d:
+#                     master_d[i] += 5
+#                 else:
+#                     master_d[i] = 0
+#             nset.clear()
+#             end = time.time()
+            
+#             print(end, start, end-start)
+#             print(master_d)
+#             print('\n\n')
+#             time.sleep(5 - (end-start))
+            
+        
+        
+        
+        
+        
+        
+        
+
+# #         Counts every second
+#         master_set = set()
+#         small_set = set()
+#         master_d = {}
+#         while(True):
+#             start = time.time()
+            
+#             try:
+#                 namelist = bot.find_elements_by_class_name("ZjFb7c")  
+#             except Exception as e:
+#                 print('page no more')
+#                 break
+            
+            
+#             for name in namelist:
+#                 try:
+#                     n = name.get_attribute('innerHTML')
+#                     small_set.add(n)
+#                 except Exception as e:
+#                     print('We out')
+#                     pass
+            
+#             master_set.update(small_set)
+#             diff_set = master_set - small_set
+            
+#             final_loop_start = time.time()
+#             HUGE = 0
+#             for i in master_set:
+                
+#                 if i in small_set:  
+#                     if i in master_d:
+#                         last_split = time.time() - master_d[i][1]
+#                         master_d[i][0] += last_split
+#                         master_d[i][2] = last_split
+#                         if master_d[i][2]>HUGE:
+#                             HUGE = master_d[i][2]
+#                         master_d[i][1] = time.time()
+                    
+#                     else:
+#                         master_d[i] = [0,time.time(),0]
+                        
+#                 elif i in diff_set:
+#                     if len(small_set) > 0:
+#                         master_d[i][1] = time.time()
+                    
+#             final_loop_end = time.time()
+            
+#             last_inc = final_loop_end - final_loop_start
+            
+#             print('Last loop took :', last_inc, ' Seconds')
+            
+#             print('Biggest increment of last loop :', HUGE)
+            
+#             end = time.time()
+            
+#             print(end, start, end-start)
+            
+#             print('Total Crowd : ',len(master_d))
+            
+#             print('Currently Online :', len(small_set))
+            
+#             small_set.clear()
+            
+#             print(master_d)
+#             print('\n\n')
+#             time.sleep(1) #for readuhability
+        
+        
+        
+        
+        
+        
+#         # This section creates a dataframe
+        
+#         df = {"Name":[],
+#              "IN_Seconds":[]}
+                        
+
+#         for key, val in master_d.items():
+#             df["Name"].append(key)
+#             df["IN_Seconds"].append(round((val[0] - val[2]) + HUGE,2))
+    
+    
+        
+#         print("\n\n\n\n\n")
+#         df = pd.DataFrame(data = df)
+#         df["IN_Minutes"] = round(df["IN_Seconds"]/60, 2)
+        
+#         print(df.sort_values(by=['IN_Minutes'], ascending = False))
+
+
+
+
+
+
+
+
+        pd.options.mode.chained_assignment = None
+
+    #   CURRENT
+    #     Counts every second
+        df_master = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
+        df_small = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
+        df_inc = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
+        while(True):
             start = time.time()
+            
             try:
                 namelist = bot.find_elements_by_class_name("ZjFb7c")  
             except Exception as e:
+                print('page no more')
                 break
             
             
             for name in namelist:
                 try:
                     n = name.get_attribute('innerHTML')
-                    nset.add(n)
+                    df_small = df_small.append({'Name':n, 'Seconds': 0, 'LastModified': 0}, ignore_index = True)
                 except Exception as e:
+                    print('We out', e)
                     pass
+            
+            #Small has current list 
+            df_small = df_small.drop_duplicates()
+#             print("df_small \n",df_small)
+            
+            print('\n')
+            
+            
+            if df_master.empty:
+                df_master = pd.concat([df_master, df_small], ignore_index = True)
+                df_master['LastModified'] = float(time.time())
+                continue
                 
-            for i in nset:        
-                if i in master_d:
-                    master_d[i] += 5
-                else:
-                    master_d[i] = 0
-            nset.clear()
+                
+            # df_inc stores those values to be incremented    
+            df_inc = df_master[df_master.Name.isin(df_small.Name) == True]
+            # print('This is inc batch', df_inc)
+            df_inc["Seconds"] = df_master['Seconds']
+            df_inc["Seconds"] += float(time.time()) - df_master["LastModified"]
+            df_inc["LastModified"] = float(time.time())
+            df_master = pd.concat([df_master, df_inc], ignore_index = True)
+            df_master = df_master.drop_duplicates(subset=['Name'], keep='last')
+            
+            
+            # left midway
+            left = df_master[df_master.Name.isin(df_small.Name) == False]
+            left["LastModified"] = float(time.time())
+            df_master = pd.concat([df_master, left], ignore_index = True)
+            df_master = df_master.drop_duplicates(subset=['Name'], keep='last')
+            
+            
+            #New guys entering for the first time
+            new_guys = df_small[df_small.Name.isin(df_master.Name) == False]
+            # print(new_guys)
+            new_guys['LastModified'] = float(time.time())
+            df_master = pd.concat([df_master, new_guys], ignore_index = True)
+            
+            print('\n')
+            
+            
+            print('df_master \n',df_master.sort_values(by=['Seconds'], ascending = False))
+            
+            
+            new_guys = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
+            df_inc = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
+            df_small = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
             end = time.time()
-            
-            print(end, start, end-start)
-            print(master_d)
-            print('\n\n')
-            time.sleep(5 - (end-start))
-            
+            print("Time taken = ", end-start)
+            time.sleep(1) #for readuhability
+            print('\n\n\n')
         
+        print('\n\n')
         
+        df_master['Minutes'] = round(df_master["Seconds"].astype(float)/60, 2)
+        print('Final Report \n')
         
-        
-        
-        
-        
-        
-        # This section creates a dataframe
-        
-        df = {"Name":[],
-             "IN_Seconds":[]}
-                        
-
-        for key, val in master_d.items():
-            df["Name"].append(key)
-            df["IN_Seconds"].append(val)
-    
-    
-        
-        print("\n\n\n\n\n")
-        df = pd.DataFrame(data = df)
-        df["IN_Minutes"] = round(df["IN_Seconds"]/60, 2)
-        
-        print(df.sort_values(by=['IN_Minutes'], ascending = False))
-
-
+        df_master = df_master[df_master['Name'] != np.nan]
+        print(df_master[["Name", "Seconds", "Minutes"]].sort_values(by=['Seconds'], ascending = True))
 
 
 
@@ -268,7 +429,7 @@ class meet_bot:
 
         
 obj = meet_bot()
-obj.login("Enter email ID","Password", 'Enter the gmeet link')
+obj.login("paddymessi13@gmail.com","Paddy@117", 'https://meet.google.com/emv-hhvp-war')
 
 
 
