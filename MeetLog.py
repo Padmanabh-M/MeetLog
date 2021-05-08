@@ -23,6 +23,7 @@ class meet_bot:
         opt.add_argument("--disable-infobars")
         opt.add_argument("start-maximized")
         opt.add_argument("--disable-extensions")
+        
         # Pass the argument 1 to allow and 2 to block
         opt.add_experimental_option("prefs", { \
         "profile.default_content_setting_values.media_stream_mic": 2, 
@@ -34,7 +35,7 @@ class meet_bot:
         
         
     
-    def login(self, email, passw, link):
+    def login(self, email, passw, link, threshold):
         
 
         
@@ -342,8 +343,8 @@ class meet_bot:
 
         pd.options.mode.chained_assignment = None
 
-    #   CURRENT
-    #     Counts every second
+#       CURRENT
+#         Counts every second
         df_master = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
         df_small = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
         df_inc = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
@@ -380,7 +381,7 @@ class meet_bot:
                 
             # df_inc stores those values to be incremented    
             df_inc = df_master[df_master.Name.isin(df_small.Name) == True]
-            # print('This is inc batch', df_inc)
+#             print('This is inc batch', df_inc)
             df_inc["Seconds"] = df_master['Seconds']
             df_inc["Seconds"] += float(time.time()) - df_master["LastModified"]
             df_inc["LastModified"] = float(time.time())
@@ -397,7 +398,7 @@ class meet_bot:
             
             #New guys entering for the first time
             new_guys = df_small[df_small.Name.isin(df_master.Name) == False]
-            # print(new_guys)
+#             print(new_guys)
             new_guys['LastModified'] = float(time.time())
             df_master = pd.concat([df_master, new_guys], ignore_index = True)
             
@@ -420,8 +421,10 @@ class meet_bot:
         df_master['Minutes'] = round(df_master["Seconds"].astype(float)/60, 2)
         print('Final Report \n')
         
+        df_master['Attendance'] = np.where(df_master.Minutes >= threshold, "PRESENT", "ABSENT")
+        
         df_master = df_master[df_master['Name'] != np.nan]
-        print(df_master[["Name", "Seconds", "Minutes"]].sort_values(by=['Seconds'], ascending = True))
+        print(df_master[["Name", "Seconds", "Minutes", 'Attendance']].sort_values(by=['Seconds'], ascending = True))
 
 
 
@@ -429,7 +432,7 @@ class meet_bot:
 
         
 obj = meet_bot()
-obj.login("paddymessi13@gmail.com","Paddy@117", 'https://meet.google.com/emv-hhvp-war')
+obj.login("Enter Email","Password", "Meet link", 'Threshold') # Time Threshold for Attendance, integer Val
 
 
 
