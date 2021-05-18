@@ -441,7 +441,7 @@ class meet_bot:
 
         
 obj = meet_bot()
-obj.login("paddymessi13@gmail.com","Paddy@117", 'https://meet.google.com/esn-hxnh-bws', 30)
+obj.login("Enter Email","Enter Password", 'Enter Meet URL', Enter Time Threshold (integer))
 
 
 
