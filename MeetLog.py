@@ -351,28 +351,31 @@ class meet_bot:
         while(True):
             start = time.time()
             
-            try:
-                namelist = bot.find_elements_by_class_name("ZjFb7c")  
+            try:     
+                namelist = np.array([my_element.get_attribute('innerHTML') for my_element in bot.find_elements_by_class_name("ZjFb7c")])
+            
             except Exception as e:
-                print('page no more')
-                break
-            
-            
-            for name in namelist:
+#                 print(e)
                 try:
-                    n = name.get_attribute('innerHTML')
-                    df_small = df_small.append({'Name':n, 'Seconds': 0, 'LastModified': 0}, ignore_index = True)
-                except Exception as e:
-                    print('We out', e)
-                    pass
-            
+                    namelist = np.array([my_element.get_attribute('innerHTML') for my_element in bot.find_elements_by_class_name("ZjFb7c")])
+                
+                except:
+                    print('page no more')
+                    break
+                
+    
+#             namearr = np.fromiter(namelist,dtype= 'U25')
+           
+            df_small = {'Name':namelist, 'Seconds': 0, 'LastModified': 0}
+            df_small = pd.DataFrame(df_small)
             #Small has current list 
             df_small = df_small.drop_duplicates()
-#             print("df_small \n",df_small)
+            
+            
             
             print('\n')
             
-            
+            # Adding the current to the master
             if df_master.empty:
                 df_master = pd.concat([df_master, df_small], ignore_index = True)
                 df_master['LastModified'] = float(time.time())
@@ -380,16 +383,22 @@ class meet_bot:
                 
                 
             # df_inc stores those values to be incremented    
+            # if present in both current and master, take them, increment and 
+            # and concatenate in master and drop duplicates
+            
             df_inc = df_master[df_master.Name.isin(df_small.Name) == True]
-#             print('This is inc batch', df_inc)
-            df_inc["Seconds"] = df_master['Seconds']
-            df_inc["Seconds"] += float(time.time()) - df_master["LastModified"]
+            df_incarrlastmod = df_inc.iloc[:, 2].values
+            diff = time.time() - df_incarrlastmod
+            df_inc["Seconds"] += diff
             df_inc["LastModified"] = float(time.time())
             df_master = pd.concat([df_master, df_inc], ignore_index = True)
             df_master = df_master.drop_duplicates(subset=['Name'], keep='last')
             
             
             # left midway
+            # present in master but not in current
+            # just update their lastModified and concat in master
+           
             left = df_master[df_master.Name.isin(df_small.Name) == False]
             left["LastModified"] = float(time.time())
             df_master = pd.concat([df_master, left], ignore_index = True)
@@ -397,20 +406,20 @@ class meet_bot:
             
             
             #New guys entering for the first time
+            # present in current but not in master
+            # updating their lastModified and concat in master
+            
             new_guys = df_small[df_small.Name.isin(df_master.Name) == False]
-#             print(new_guys)
             new_guys['LastModified'] = float(time.time())
             df_master = pd.concat([df_master, new_guys], ignore_index = True)
             
             print('\n')
             
+            print('Total Entries :',len(df_master) )
+            print('Active :', len(df_small))
+#             print('df_master \n',df_master.sort_values(by=['Seconds'], ascending = False))
             
-            print('df_master \n',df_master.sort_values(by=['Seconds'], ascending = False))
             
-            
-            new_guys = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
-            df_inc = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
-            df_small = pd.DataFrame(columns=['Name', 'Seconds', 'LastModified'])
             end = time.time()
             print("Time taken = ", end-start)
             time.sleep(1) #for readuhability
@@ -423,7 +432,7 @@ class meet_bot:
         
         df_master['Attendance'] = np.where(df_master.Minutes >= threshold, "PRESENT", "ABSENT")
         
-        df_master = df_master[df_master['Name'] != np.nan]
+        df_master = df_master[df_master['Name'] != None]
         print(df_master[["Name", "Seconds", "Minutes", 'Attendance']].sort_values(by=['Seconds'], ascending = True))
 
 
@@ -432,7 +441,7 @@ class meet_bot:
 
         
 obj = meet_bot()
-obj.login("Enter Email","Password", "Meet link", 'Threshold') # Time Threshold for Attendance, integer Val
+obj.login("paddymessi13@gmail.com","Paddy@117", 'https://meet.google.com/esn-hxnh-bws', 30)
 
 
 
