@@ -365,7 +365,7 @@ class meet_bot:
                 
     
 #             namearr = np.fromiter(namelist,dtype= 'U25')
-           
+            namelist = list(map(str.lower,namelist))
             df_small = {'Name':namelist, 'Seconds': 0, 'LastModified': 0}
             df_small = pd.DataFrame(df_small)
             #Small has current list 
@@ -417,7 +417,7 @@ class meet_bot:
             
             print('Total Entries :',len(df_master) )
             print('Active :', len(df_small))
-#             print('df_master \n',df_master.sort_values(by=['Seconds'], ascending = False))
+            print('df_master \n',df_master.sort_values(by=['Seconds'], ascending = False))
             
             
             end = time.time()
